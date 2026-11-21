@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- ================= VUE A : LISTE DES ATELIERS ================= -->
+    <LinearLayout
+        android:id="@+id/viewA"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ateliers des Clubs"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#1F4E78"
+            android:layout_marginBottom="16dp"/>
+
+        <ListView
+            android:id="@+id/lvAteliers"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="16dp"/>
+
+        <Button
+            android:id="@+id/btnGoToMesReservations"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Voir mes réservations"
+            android:backgroundTint="#7C3AED"
+            android:textColor="#FFFFFF"/>
+    </LinearLayout>
+
+    <!-- ================= VUE B : FORMULAIRE DE RÉSERVATION ================= -->
+    <LinearLayout
+        android:id="@+id/viewB"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nouvelle Réservation"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#1F4E78"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/etNom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nom"
+            android:layout_marginBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/etPrenom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Prénom"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Choisir l'atelier :"
+            android:textStyle="bold"/>
+        <Spinner
+            android:id="@+id/spAteliers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"/>
+
+        <Button
+            android:id="@+id/btnConfirmerReservation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Confirmer la réservation"
+            android:backgroundTint="#10B981"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="8dp"/>
+
+        <Button
+            android:id="@+id/btnBackB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Retour"
+            style="@style/Widget.Material3.Button.OutlinedButton"/>
+    </LinearLayout>
+
+    <!-- ================= VUE C : MES RÉSERVATIONS ================= -->
+    <LinearLayout
+        android:id="@+id/viewC"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Mes Réservations"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#1F4E78"
+            android:layout_marginBottom="16dp"/>
+
+        <Spinner
+            android:id="@+id/spFiltre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"/>
+
+        <ListView
+            android:id="@+id/lvReservations"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="16dp"/>
+
+        <Button
+            android:id="@+id/btnBackC"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Retour aux ateliers"
+            style="@style/Widget.Material3.Button.OutlinedButton"/>
+    </LinearLayout>
+
+</FrameLayout>
