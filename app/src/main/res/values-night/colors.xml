@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#818CF8</color> <!-- Lighter Indigo for dark mode -->
+    <color name="onPrimary">#1E1B4B</color>
+    <color name="secondary">#34D399</color>
+    <color name="onSecondary">#064E3B</color>
+    <color name="background">#0B1120</color> <!-- Deep dark blue -->
+    <color name="surface">#1E293B</color>
+    <color name="onBackground">#F8FAFC</color>
+    <color name="onSurface">#CBD5E1</color>
+    <color name="danger">#F87171</color>
+    <color name="warning">#FBBF24</color>
+    <color name="stroke">#334155</color>
+</resources>

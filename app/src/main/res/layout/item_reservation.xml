@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="1dp"
+    app:cardBackgroundColor="@color/surface"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/stroke">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvResNom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ali Ben"
+                android:textColor="@color/onBackground"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvResAtelier"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Atelier Kotlin"
+                android:textColor="@color/onSurface"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvResStatut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Confirmé"
+                android:textColor="@color/primary"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Cancel Button -->
+        <ImageButton
+            android:id="@+id/btnCancelRes"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_delete"
+            app:tint="@color/danger"
+            android:contentDescription="Annuler la réservation" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

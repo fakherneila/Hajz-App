@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#4F46E5</color> <!-- Indigo -->
+    <color name="onPrimary">#FFFFFF</color>
+    <color name="secondary">#10B981</color> <!-- Emerald -->
+    <color name="onSecondary">#FFFFFF</color>
+    <color name="background">#F8FAFC</color> <!-- Very light gray -->
+    <color name="surface">#FFFFFF</color>
+    <color name="onBackground">#0F172A</color>
+    <color name="onSurface">#334155</color>
+    <color name="danger">#EF4444</color>
+    <color name="warning">#F59E0B</color>
+    <color name="stroke">#E2E8F0</color>
+</resources>

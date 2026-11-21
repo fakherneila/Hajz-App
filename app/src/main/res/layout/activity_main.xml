@@ -1,137 +1,181 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:background="@color/background">
 
-    <!-- ================= VUE A : LISTE DES ATELIERS ================= -->
-    <LinearLayout
-        android:id="@+id/viewA"
+    <!-- APP BAR -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        app:elevation="0dp">
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Hajz-App"
+            app:titleTextColor="@color/primary"
+            app:subtitle="Réservation Ateliers"
+            app:subtitleTextColor="@color/onSurface" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- CONTENT -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:visibility="visible">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <TextView
+        <!-- VUE A -->
+        <LinearLayout
+            android:id="@+id/viewA"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Ateliers des Clubs"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#1F4E78"
-            android:layout_marginBottom="16dp"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:visibility="visible">
 
-        <ListView
-            android:id="@+id/lvAteliers"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvAteliers"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginBottom="16dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGoToMesReservations"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Voir mes réservations"
+                android:textAllCaps="false"
+                app:cornerRadius="16dp" />
+        </LinearLayout>
+
+        <!-- VUE B -->
+        <LinearLayout
+            android:id="@+id/viewB"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginBottom="16dp"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:visibility="gone"
+            android:background="@color/background">
 
-        <Button
-            android:id="@+id/btnGoToMesReservations"
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nouvelle Réservation"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/onBackground"
+                android:layout_marginBottom="24dp"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etNom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Nom" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPrenom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Prénom" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Choisir l'atelier :"
+                android:textStyle="bold"
+                android:textColor="@color/onBackground"
+                android:layout_marginBottom="8dp"/>
+                
+            <Spinner
+                android:id="@+id/spAteliers"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="24dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnConfirmerReservation"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Confirmer"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/secondary"
+                app:cornerRadius="16dp"
+                android:layout_marginBottom="12dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnBackB"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Retour"
+                android:textAllCaps="false"
+                app:cornerRadius="16dp"/>
+        </LinearLayout>
+
+        <!-- VUE C -->
+        <LinearLayout
+            android:id="@+id/viewC"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Voir mes réservations"
-            android:backgroundTint="#7C3AED"
-            android:textColor="#FFFFFF"/>
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:visibility="gone"
+            android:background="@color/background">
 
-    <!-- ================= VUE B : FORMULAIRE DE RÉSERVATION ================= -->
-    <LinearLayout
-        android:id="@+id/viewB"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:visibility="gone">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mes Réservations"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/onBackground"
+                android:layout_marginBottom="16dp"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Nouvelle Réservation"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#1F4E78"
-            android:layout_marginBottom="16dp"/>
+            <Spinner
+                android:id="@+id/spFiltre"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="16dp"/>
 
-        <EditText
-            android:id="@+id/etNom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Nom"
-            android:layout_marginBottom="8dp"/>
+            <ListView
+                android:id="@+id/lvReservations"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginBottom="16dp"/>
 
-        <EditText
-            android:id="@+id/etPrenom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Prénom"
-            android:layout_marginBottom="16dp"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Choisir l'atelier :"
-            android:textStyle="bold"/>
-        <Spinner
-            android:id="@+id/spAteliers"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"/>
-
-        <Button
-            android:id="@+id/btnConfirmerReservation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Confirmer la réservation"
-            android:backgroundTint="#10B981"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="8dp"/>
-
-        <Button
-            android:id="@+id/btnBackB"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Retour"
-            style="@style/Widget.Material3.Button.OutlinedButton"/>
-    </LinearLayout>
-
-    <!-- ================= VUE C : MES RÉSERVATIONS ================= -->
-    <LinearLayout
-        android:id="@+id/viewC"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Mes Réservations"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#1F4E78"
-            android:layout_marginBottom="16dp"/>
-
-        <Spinner
-            android:id="@+id/spFiltre"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"/>
-
-        <ListView
-            android:id="@+id/lvReservations"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginBottom="16dp"/>
-
-        <Button
-            android:id="@+id/btnBackC"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Retour aux ateliers"
-            style="@style/Widget.Material3.Button.OutlinedButton"/>
-    </LinearLayout>
-
-</FrameLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnBackC"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Retour aux ateliers"
+                android:textAllCaps="false"
+                app:cornerRadius="16dp"/>
+        </LinearLayout>
+    </FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
