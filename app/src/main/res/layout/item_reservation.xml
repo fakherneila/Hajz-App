@@ -27,7 +27,7 @@
                 android:id="@+id/tvResNom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Ali Ben"
+                android:text="@string/demo_reservation_name"
                 android:textColor="@color/onBackground"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -36,30 +36,76 @@
                 android:id="@+id/tvResAtelier"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Atelier Kotlin"
+                android:text="@string/demo_reservation_workshop"
                 android:textColor="@color/onSurface"
                 android:textSize="14sp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="4dp"
+                    android:src="@drawable/ic_calendar"
+                    android:contentDescription="@null"
+                    app:tint="@color/blue_500" />
+                <TextView
+                    android:id="@+id/tvResDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/demo_date"
+                    android:textColor="@color/onSurface"
+                    android:textSize="12sp" />
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="4dp"
+                    android:src="@drawable/ic_door"
+                    android:contentDescription="@null"
+                    app:tint="@color/blue_500" />
+                <TextView
+                    android:id="@+id/tvResSalle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/demo_room"
+                    android:textColor="@color/onSurface"
+                    android:textSize="12sp" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvResStatut"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Confirmé"
+                android:text="@string/demo_reservation_status"
                 android:textColor="@color/primary"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:layout_marginTop="4dp" />
+            <TextView
+                android:id="@+id/tvResAttente"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/demo_waiting"
+                android:textColor="@color/onSurface"
+                android:textSize="12sp"
+                android:visibility="gone" />
         </LinearLayout>
 
         <!-- Cancel Button -->
         <ImageButton
             android:id="@+id/btnCancelRes"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_delete"
+            android:src="@drawable/ic_cancel"
             app:tint="@color/danger"
-            android:contentDescription="Annuler la réservation" />
+            android:contentDescription="@string/annuler_reservation" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

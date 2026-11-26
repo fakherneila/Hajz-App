@@ -2,10 +2,12 @@ package tn.issatso.clubs
 
 class Atelier(
     val id: Int,
-    val club: String,
-    val nom: String,
-    val date: String,
-    val capacite: Int = 2
+    var club: String,
+    var nom: String,
+    var date: String,
+    var capacite: Int = 2,
+    var instructeur: String = "M. Trabelsi",
+    var salle: String = "I01"
 ) {
     val reservations = mutableListOf<Reservation>()
 

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="espace_page">12dp</dimen>
+    <dimen name="espace_section">8dp</dimen>
+    <dimen name="space_4">4dp</dimen>
+    <dimen name="space_8">8dp</dimen>
+    <dimen name="space_12">12dp</dimen>
+    <dimen name="space_16">16dp</dimen>
+    <dimen name="space_24">24dp</dimen>
+    <dimen name="space_32">32dp</dimen>
+    <dimen name="radius_chip">12dp</dimen>
+    <dimen name="radius_button">12dp</dimen>
+    <dimen name="radius_card">16dp</dimen>
+    <dimen name="radius_dialog">24dp</dimen>
+    <dimen name="touch_target">48dp</dimen>
+</resources>
