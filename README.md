@@ -2,6 +2,20 @@
 
 Hajz-App est une application Android destinée à gérer les ateliers des clubs, les inscriptions des étudiants et les listes d’attente.
 
+## Binôme
+
+- **Fakher Neila** — ING-A3-GL-AL-04
+- **Mohammed Amine Naimi** — ING-A3-GL-**03**
+
+**Module :** Développement Mobile — ISSAT Sousse
+**Enseignante :** Mme Safa Ezzehi
+**Année universitaire :** 2026–2027
+
+---
+
+Hajz-App est une application Android destinée à gérer les ateliers des clubs, les inscriptions des étudiants et les listes d'attente.
+
+
 ## Fonctionnalités
 
 - Réservation dans les ateliers disponibles
@@ -89,4 +103,8 @@ La validation effectuée comprend `./gradlew testDebugUnitTest`, `assembleDebug`
 
 ## Déclaration des sources
 
-Les assistants IA suivants ont été utilisés sous supervision humaine : Gemini, GitHub Copilot et Claude.
+Projet réalisé en binôme par :
+- Fakher Neila (ING-A3-GL-AL-04)
+- Mohammed Amine Naimi (ING-A3-GL-03)
+
+Assistants IA utilisés sous supervision humaine : Gemini, GitHub Copilot et Claude. Tout le code a été lu, testé et adapté .
