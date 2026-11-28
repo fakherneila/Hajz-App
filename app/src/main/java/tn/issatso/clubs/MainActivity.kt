@@ -11,10 +11,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat
@@ -24,7 +25,6 @@ import java.util.Locale
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        private const val ADMIN_PIN = "2026"
         private const val MIN_CAPACITY = 1
         private const val MAX_CAPACITY = 50
         private const val DEFAULT_CAPACITY = 2
@@ -38,13 +38,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun actualiserIdentiteReservation() {
+        val user = currentUser
+        btnConfirmerReservation.isEnabled = user != null
+        tvReserveAs.text = if (user == null) {
+            getString(R.string.please_login)
+        } else {
+            getString(R.string.reserve_as, user.prenom, user.nom)
+        }
+    }
+
     private lateinit var viewA: View
     private lateinit var viewB: View
     private lateinit var viewC: View
+    private lateinit var viewLogin: View
+    private lateinit var appBar: View
+    private lateinit var reservationFabContainer: View
+    private lateinit var etLoginUser: EditText
+    private lateinit var etLoginPass: EditText
+    private lateinit var tvLoginError: TextView
+    private lateinit var tvUserStatus: TextView
+    private lateinit var tvReserveAs: TextView
+    private lateinit var btnConfirmerReservation: View
 
     private lateinit var adapterReservations: ReservationAdapter
     private var filtreActif = 0
-    private var adminMode = false
+    private var currentUser: User? = null
     private var searchText = ""
     private var selectedClub: String? = null
     private var activeView = "A"
@@ -136,7 +155,7 @@ class MainActivity : AppCompatActivity() {
                 afficherVueB()
             }
             holder.itemView.setOnLongClickListener {
-                if (adminMode) {
+                if (isAdmin()) {
                     showAdminWorkshopDialog(a)
                     true
                 } else {
@@ -163,56 +182,6 @@ class MainActivity : AppCompatActivity() {
         override fun getItemCount() = ateliers.size
     }
 
-    inner class ReservationAdapter : BaseAdapter() {
-        private val reservations = mutableListOf<Reservation>()
-
-        fun replaceItems(items: List<Reservation>) {
-            reservations.clear()
-            reservations.addAll(items)
-            notifyDataSetChanged()
-        }
-
-        override fun getCount() = reservations.size
-
-        override fun getItem(position: Int): Reservation = reservations[position]
-
-        override fun getItemId(position: Int): Long = reservations[position].hashCode().toLong()
-
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val row = convertView ?: LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_reservation, parent, false)
-            val reservation = getItem(position)
-            row.findViewById<TextView>(R.id.tvResNom).text =
-                "${reservation.prenom} ${reservation.nom}"
-            row.findViewById<TextView>(R.id.tvResAtelier).text =
-                reservation.atelier.nom
-            row.findViewById<TextView>(R.id.tvResDate).text = reservation.atelier.date
-            row.findViewById<TextView>(R.id.tvResSalle).text = reservation.atelier.salle
-            val statutView = row.findViewById<TextView>(R.id.tvResStatut)
-            val attenteView = row.findViewById<TextView>(R.id.tvResAttente)
-            if (reservation.ticketAttente == null) {
-                statutView.text = getString(R.string.status_confirmed)
-                statutView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_check, 0, 0, 0)
-                statutView.compoundDrawablePadding = resources.getDimensionPixelSize(R.dimen.space_4)
-                attenteView.visibility = View.GONE
-            } else {
-                val ahead = BookingManager.personnesDevant(reservation)
-                val personne = if (ahead == 1) "personne" else "personnes"
-                statutView.text = " ${getString(R.string.status_waiting)} #${reservation.ticketAttente}"
-                statutView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_hourglass, 0, 0, 0)
-                statutView.compoundDrawablePadding = resources.getDimensionPixelSize(R.dimen.space_4)
-                attenteView.visibility = View.VISIBLE
-                attenteView.text = "$ahead $personne"
-            }
-            val cancelButton = row.findViewById<ImageButton>(R.id.btnCancelRes)
-            setTooltipCompat(cancelButton, getString(R.string.annuler_reservation))
-            cancelButton.setOnClickListener {
-                showCancelDialog(reservation)
-            }
-            return row
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -220,9 +189,19 @@ class MainActivity : AppCompatActivity() {
         viewA = findViewById(R.id.viewA)
         viewB = findViewById(R.id.viewB)
         viewC = findViewById(R.id.viewC)
+        viewLogin = findViewById(R.id.viewLogin)
+        appBar = findViewById(R.id.appBar)
+        reservationFabContainer = findViewById(R.id.reservationFabContainer)
+        etLoginUser = findViewById(R.id.etLoginUser)
+        etLoginPass = findViewById(R.id.etLoginPass)
+        tvLoginError = findViewById(R.id.tvLoginError)
+        tvUserStatus = findViewById(R.id.tvUserStatus)
+        tvReserveAs = findViewById(R.id.tvReserveAs)
+        btnConfirmerReservation = findViewById(R.id.btnConfirmerReservation)
+        currentUser = AuthManager.getCurrentUser(this)
+        actualiserIdentiteReservation()
         setTooltipCompat(findViewById(R.id.btnAjouterAtelier), getString(R.string.ajouter_atelier))
         setTooltipCompat(findViewById(R.id.btnExporter), getString(R.string.exporter))
-        setTooltipCompat(findViewById(R.id.btnAdmin), getString(R.string.admin_access))
         setTooltipCompat(findViewById(R.id.btnBackB), getString(R.string.retour_ateliers))
         setTooltipCompat(findViewById(R.id.btnBackC), getString(R.string.retour_ateliers))
         setTooltipCompat(findViewById(R.id.btnGoToMesReservations), getString(R.string.voir_mes_reservations))
@@ -234,13 +213,11 @@ class MainActivity : AppCompatActivity() {
                     filtreActif = snapshot.ui.filter
                     searchText = snapshot.ui.searchText
                     selectedClub = snapshot.ui.selectedClub
-                    adminMode = snapshot.ui.adminMode
                     activeView = snapshot.ui.activeView
                     selectedWorkshopId = snapshot.ui.selectedWorkshopId
                 }
             }
         }
-
         // Setup RecyclerView
         val rvAteliers = findViewById<RecyclerView>(R.id.rvAteliers)
         rvAteliers.layoutManager = LinearLayoutManager(this)
@@ -257,9 +234,41 @@ class MainActivity : AppCompatActivity() {
         )
         findViewById<EditText>(R.id.etRechercheAteliers).setText(searchText)
         rebuildClubChips()
-        
+
+        findViewById<View>(R.id.btnLogin).setOnClickListener {
+            val user = AuthManager.login(
+                etLoginUser.text.toString(),
+                etLoginPass.text.toString()
+            )
+            if (user == null) {
+                tvLoginError.visibility = View.VISIBLE
+                Toast.makeText(this, R.string.login_error, Toast.LENGTH_SHORT).show()
+            } else {
+                currentUser = user
+                AuthManager.saveUser(this, user)
+                actualiserIdentiteReservation()
+                activeView = "A"
+                tvLoginError.visibility = View.GONE
+                afficherEcranAuthentifie()
+                updateAdminUi()
+                afficherVueARestored()
+                actualiserVueA()
+                actualiserVueC()
+            }
+        }
+        findViewById<View>(R.id.btnLogout).setOnClickListener {
+            AuthManager.logout(this)
+            currentUser = null
+            actualiserIdentiteReservation()
+            activeView = "A"
+            etLoginUser.text.clear()
+            etLoginPass.text.clear()
+            tvLoginError.visibility = View.GONE
+            afficherEcranConnexion()
+            updateAdminUi()
+            actualiserVueC()
+        }
         findViewById<View>(R.id.btnGoToMesReservations).setOnClickListener { afficherVueC() }
-        findViewById<View>(R.id.btnAdmin).setOnClickListener { onAdminButtonClicked() }
         findViewById<View>(R.id.btnAjouterAtelier).setOnClickListener { showAddWorkshopDialog() }
         findViewById<View>(R.id.btnExporter).setOnClickListener { exportAteliers() }
         updateAdminUi()
@@ -267,21 +276,121 @@ class MainActivity : AppCompatActivity() {
         // Setup Spinner
         refreshAtelierSpinner()
         
-        findViewById<View>(R.id.btnBackB).setOnClickListener { afficherVueA() }
-        findViewById<View>(R.id.btnConfirmerReservation).setOnClickListener { gererReservation() }
+        btnConfirmerReservation.setOnClickListener { gererReservation() }
 
         // Setup Vue C
-        val lvReservations = findViewById<ListView>(R.id.lvReservations)
-        adapterReservations = ReservationAdapter()
-        lvReservations.adapter = adapterReservations
-        findViewById<View>(R.id.btnBackC).setOnClickListener { afficherVueA() }
-        rebuildFilterChips()
-
-        when (activeView) {
-            "B" -> afficherVueBRestored()
-            "C" -> afficherVueCRestored()
-            else -> afficherVueARestored()
+        val rvReservations = findViewById<RecyclerView>(R.id.rvReservations)
+        rvReservations.layoutManager = LinearLayoutManager(this)
+        adapterReservations = ReservationAdapter(
+            mutableListOf(),
+            canCancel = { reservation ->
+                currentUser?.role == Role.ADMIN ||
+                    (reservation.nom.equals(currentUser?.nom, ignoreCase = true) &&
+                        reservation.prenom.equals(currentUser?.prenom, ignoreCase = true))
+            }
+        ) { reservation ->
+            if (BookingManager.annuler(reservation) != null) {
+                Toast.makeText(this, "Réservation annulée", Toast.LENGTH_SHORT).show()
+                actualiserVueA()
+            } else {
+                Toast.makeText(this, "Cette réservation n’existe plus", Toast.LENGTH_SHORT).show()
+            }
+            actualiserVueC()
         }
+        rvReservations.adapter = adapterReservations
+        val swipeCallback = object : ItemTouchHelper.SimpleCallback(
+            0,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean = false
+
+            override fun getSwipeDirs(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int {
+                val position = viewHolder.adapterPosition
+                return if (position == RecyclerView.NO_POSITION ||
+                    !adapterReservations.canCancel(position)
+                ) {
+                    0
+                } else {
+                    super.getSwipeDirs(recyclerView, viewHolder)
+                }
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    if (adapterReservations.canCancel(position)) {
+                        adapterReservations.removeItem(position)
+                    } else {
+                        Toast.makeText(
+                            this@MainActivity,
+                            R.string.cannot_cancel_other,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        adapterReservations.notifyItemNeedsRefresh(position)
+                    }
+                }
+            }
+        }
+        ItemTouchHelper(swipeCallback).attachToRecyclerView(rvReservations)
+        findViewById<View>(R.id.btnBackC).setOnClickListener {
+            afficherVueA()
+        }
+        findViewById<View>(R.id.btnBackB).setOnClickListener {
+            afficherVueA()
+        }
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (currentUser == null) {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                    return
+                }
+                if (activeView == "B" || activeView == "C") {
+                    afficherVueA()
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        })
+        rebuildFilterChips()
+        actualiserStatutUtilisateur()
+
+        if (currentUser == null) {
+            afficherEcranConnexion()
+            actualiserVueC()
+        } else {
+            afficherEcranAuthentifie()
+            when (activeView) {
+                "B" -> afficherVueBRestored()
+                "C" -> afficherVueCRestored()
+                else -> afficherVueARestored()
+            }
+        }
+    }
+
+    private fun afficherEcranConnexion() {
+        viewLogin.visibility = View.VISIBLE
+        viewA.visibility = View.GONE
+        viewB.visibility = View.GONE
+        viewC.visibility = View.GONE
+        appBar.visibility = View.GONE
+        reservationFabContainer.visibility = View.GONE
+        actualiserStatutUtilisateur()
+    }
+
+    private fun afficherEcranAuthentifie() {
+        viewLogin.visibility = View.GONE
+        appBar.visibility = View.VISIBLE
+        reservationFabContainer.visibility = View.VISIBLE
+        actualiserStatutUtilisateur()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -295,7 +404,7 @@ class MainActivity : AppCompatActivity() {
                 filtreActif,
                 searchText,
                 selectedClub,
-                adminMode,
+                isAdmin(),
                 selectedWorkshopId
             )
         )
@@ -310,6 +419,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun afficherVueB() {
+        actualiserIdentiteReservation()
         activeView = "B"
         animateTransition(viewA, viewB)
         animateTransition(viewC, viewB)
@@ -386,29 +496,52 @@ class MainActivity : AppCompatActivity() {
 
     private fun actualiserVueC() {
         val toutes = BookingManager.ateliers.flatMap { it.reservations }
-        val visibles = toutes.filter { r ->
+        val reservationsAutorisees = when (currentUser?.role) {
+            Role.ADMIN -> toutes
+            Role.ETUDIANT -> currentUser?.let { user ->
+                toutes.filter { reservation ->
+                    reservation.nom.equals(user.nom, ignoreCase = true) &&
+                        reservation.prenom.equals(user.prenom, ignoreCase = true)
+                }
+            }.orEmpty()
+            null -> emptyList()
+        }
+        val visibles = reservationsAutorisees.filter { r ->
             val estConfirme = r.ticketAttente == null
             filtreActif == 0 || (filtreActif == 1 && estConfirme) || (filtreActif == 2 && !estConfirme)
         }
         adapterReservations.replaceItems(visibles)
-        val lv = findViewById<ListView>(R.id.lvReservations)
+        val rv = findViewById<RecyclerView>(R.id.rvReservations)
         val empty = findViewById<View>(R.id.emptyReservations)
         val emptyText = findViewById<TextView>(R.id.tvEmptyReservations)
         if (visibles.isEmpty()) {
-            lv.visibility = View.GONE
+            rv.visibility = View.GONE
             empty.visibility = View.VISIBLE
-            emptyText.text = if (toutes.isEmpty()) {
-                getString(R.string.empty_reservations)
-            } else {
-                getString(R.string.empty_filtered_reservations)
+            emptyText.text = when {
+                currentUser == null -> getString(R.string.please_login)
+                currentUser?.role == Role.ETUDIANT ->
+                    getString(R.string.empty_my_reservations)
+                reservationsAutorisees.isEmpty() -> getString(R.string.empty_reservations)
+                else -> getString(R.string.empty_filtered_reservations)
             }
         } else {
-            lv.visibility = View.VISIBLE
+            rv.visibility = View.VISIBLE
             empty.visibility = View.GONE
         }
         val badge = findViewById<TextView>(R.id.tvReservationBadge)
-        badge.text = toutes.size.toString()
-        badge.visibility = if (toutes.isEmpty()) View.GONE else View.VISIBLE
+        badge.text = reservationsAutorisees.size.toString()
+        badge.visibility = if (reservationsAutorisees.isEmpty()) View.GONE else View.VISIBLE
+    }
+
+    private fun actualiserStatutUtilisateur() {
+        tvUserStatus.text = when (val user = currentUser) {
+            null -> getString(R.string.not_connected)
+            else -> if (user.role == Role.ADMIN) {
+                getString(R.string.admin_connected)
+            } else {
+                getString(R.string.connected_as, user.prenom, user.nom)
+            }
+        }
     }
 
     private fun actualiserVueA() {
@@ -557,79 +690,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun onAdminButtonClicked() {
-        if (adminMode) {
-            MaterialAlertDialogBuilder(this)
-                .setMessage("Quitter le mode admin ?")
-                .setNegativeButton("Non", null)
-                .setPositiveButton("Oui") { _, _ ->
-                    adminMode = false
-                    updateAdminUi()
-                    Toast.makeText(this, "Mode admin désactivé", Toast.LENGTH_SHORT).show()
-                }
-                .show()
-        } else {
-            showAdminPinDialog()
-        }
-    }
-
-    private fun showAdminPinDialog() {
-        val pinInput = EditText(this).apply {
-            hint = getString(R.string.admin_pin_hint)
-            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-        }
-        val dialog = MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.admin_pin_title)
-            .setView(pinInput)
-            .setNegativeButton(R.string.annuler, null)
-            .setPositiveButton(R.string.valider, null)
-            .create()
-        dialog.setOnShowListener {
-            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                if (pinInput.text.toString().trim() == ADMIN_PIN) {
-                    adminMode = true
-                    updateAdminUi()
-                    dialog.dismiss()
-                    Toast.makeText(this, "Mode admin activé", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, R.string.pin_incorrect, Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-        dialog.show()
-    }
-
     private fun updateAdminUi() {
-        val button = findViewById<ImageButton>(R.id.btnAdmin)
         val addButton = findViewById<ImageButton>(R.id.btnAjouterAtelier)
         val exportButton = findViewById<ImageButton>(R.id.btnExporter)
-        if (adminMode) {
-            button.setImageResource(R.drawable.ic_admin_unlock)
-            button.setBackgroundResource(R.drawable.bg_admin_on)
-            button.imageTintList = android.content.res.ColorStateList.valueOf(
-                getColor(R.color.on_admin_accent)
-            )
-            button.contentDescription = getString(R.string.quit_admin_access)
-            setTooltipCompat(button, getString(R.string.quit_admin_access))
-            addButton.visibility = View.VISIBLE
-            exportButton.visibility = View.VISIBLE
-        } else {
-            button.setImageResource(R.drawable.ic_admin_lock)
-            button.setBackgroundResource(android.R.color.transparent)
-            button.imageTintList = android.content.res.ColorStateList.valueOf(
-                getColor(R.color.onPrimary)
-            )
-            button.contentDescription = getString(R.string.admin_access)
-            setTooltipCompat(button, getString(R.string.admin_access))
-            addButton.visibility = View.GONE
-            exportButton.visibility = View.GONE
-        }
+        addButton.visibility = if (isAdmin()) View.VISIBLE else View.GONE
+        exportButton.visibility = if (isAdmin()) View.VISIBLE else View.GONE
+        actualiserStatutUtilisateur()
         actualiserVueA()
     }
+
+    private fun isAdmin(): Boolean = currentUser?.role == Role.ADMIN
 
     private fun showDetailsDialog(atelier: Atelier) {
         val content = LayoutInflater.from(this).inflate(R.layout.dialog_details, null)
@@ -656,15 +726,16 @@ class MainActivity : AppCompatActivity() {
             .setTitle(R.string.details)
             .setView(content)
             .setPositiveButton(R.string.fermer, null)
-        if (adminMode) {
+        if (isAdmin()) {
             builder.setNeutralButton(R.string.modifier_details) { _, _ ->
-                if (adminMode) showEditDetailsDialog(atelier)
+                if (isAdmin()) showEditDetailsDialog(atelier)
             }
         }
         builder.show()
     }
 
     private fun showAddWorkshopDialog() {
+        if (!isAdmin()) return
         val content = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(
@@ -803,6 +874,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showAdminWorkshopDialog(atelier: Atelier) {
+        if (!isAdmin()) return
         val actions = arrayOf(
             getString(R.string.voir_participants),
             getString(R.string.modifier_details),
@@ -1022,7 +1094,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun exportAteliers() {
-        if (!adminMode) return
+        if (!isAdmin()) return
         val text = ExportAteliers.generer(BookingManager.ateliers)
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
@@ -1032,39 +1104,15 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent.createChooser(intent, getString(R.string.export_partage_titre)))
     }
 
-    private fun showCancelDialog(reservation: Reservation) {
-        MaterialAlertDialogBuilder(this)
-            .setMessage("Annuler cette réservation ?")
-            .setNegativeButton("Non", null)
-            .setPositiveButton("Oui") { _, _ ->
-                val undo = BookingManager.annuler(reservation) ?: return@setPositiveButton
-                actualiserVueA()
-                actualiserVueC()
-
-                undo.promotedReservation?.let {
-                    Toast.makeText(
-                        this,
-                        "Une place s'est libérée : ${it.prenom} ${it.nom} est maintenant confirmé(e)",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-
-                Snackbar.make(
-                    findViewById(android.R.id.content),
-                    "Réservation annulée",
-                    Snackbar.LENGTH_LONG
-                ).setAction("ANNULER") {
-                    BookingManager.restaurerAnnulation(undo)
-                    actualiserVueA()
-                    actualiserVueC()
-                }.show()
-            }
-            .show()
-    }
-
     private fun gererReservation() {
-        val nom = findViewById<EditText>(R.id.etNom).text.toString()
-        val prenom = findViewById<EditText>(R.id.etPrenom).text.toString()
+        val user = currentUser
+        if (user == null) {
+            Toast.makeText(this, R.string.please_login, Toast.LENGTH_SHORT).show()
+            actualiserIdentiteReservation()
+            return
+        }
+        val nom = user.nom
+        val prenom = user.prenom
         val spinner = findViewById<Spinner>(R.id.spAteliers)
         val reservables = reservableAteliers()
         if (reservables.isEmpty() || spinner.selectedItemPosition !in reservables.indices) {
@@ -1077,8 +1125,10 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, resultat, Toast.LENGTH_LONG).show()
 
         if (resultat.startsWith("Succès")) {
-            findViewById<EditText>(R.id.etNom).text.clear()
-            findViewById<EditText>(R.id.etPrenom).text.clear()
+            Session.setCurrentUser(this, nom, prenom)
+            actualiserStatutUtilisateur()
+            actualiserVueA()
+            actualiserVueC()
             afficherVueA()
         }
     }

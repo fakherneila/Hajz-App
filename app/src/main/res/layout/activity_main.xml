@@ -58,16 +58,6 @@
                         app:tint="@color/onPrimary"
                         android:contentDescription="@string/exporter"
                         android:visibility="gone" />
-                    <ImageButton
-                        android:id="@+id/btnAdmin"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginStart="4dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:src="@drawable/ic_admin_lock"
-                        app:tint="@color/onPrimary"
-                        android:contentDescription="@string/admin_access"
-                        />
                 </LinearLayout>
             </RelativeLayout>
         </com.google.android.material.appbar.MaterialToolbar>
@@ -75,9 +65,81 @@
 
     <!-- CONTENT -->
     <FrameLayout
+        android:id="@+id/contentArea"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:id="@+id/viewLogin"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:text="@string/login_title"
+                android:textAlignment="center"
+                android:textColor="@color/onBackground"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etLoginUser"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_username"
+                    android:inputType="text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etLoginPass"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_password"
+                    android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/btn_login"
+                android:textAllCaps="false"
+                app:cornerRadius="16dp" />
+
+            <TextView
+                android:id="@+id/tvLoginError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="@string/login_error"
+                android:textColor="@color/danger"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvDemoUsers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/demo_users_hint"
+                android:textColor="@color/onSurface"
+                android:textSize="12sp" />
+        </LinearLayout>
 
         <!-- VUE A -->
         <LinearLayout
@@ -86,7 +148,30 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="16dp"
-            android:visibility="visible">
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/tvUserStatus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/not_connected"
+                    android:textColor="@color/onSurface"
+                    android:textStyle="bold" />
+                <Button
+                    android:id="@+id/btnLogout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:text="@string/btn_logout" />
+            </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
@@ -192,10 +277,19 @@
                     android:textColor="@color/onBackground"/>
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/tvReserveAs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:textColor="@color/onSurface"
+                android:textStyle="bold" />
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                android:visibility="gone"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
@@ -204,13 +298,15 @@
                     android:id="@+id/etNom"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/nom" />
+                    android:hint="@string/nom"
+                    android:visibility="gone" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                android:visibility="gone"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
@@ -219,7 +315,8 @@
                     android:id="@+id/etPrenom"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/prenom" />
+                    android:hint="@string/prenom"
+                    android:visibility="gone" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <Spinner
@@ -289,12 +386,11 @@
                     android:orientation="horizontal"/>
             </HorizontalScrollView>
 
-            <ListView
-                android:id="@+id/lvReservations"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvReservations"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_marginBottom="16dp"/>
+                android:layout_weight="1" />
 
             <LinearLayout
                 android:id="@+id/emptyReservations"
@@ -324,6 +420,7 @@
         </LinearLayout>
     </FrameLayout>
     <FrameLayout
+        android:id="@+id/reservationFabContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"

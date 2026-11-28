@@ -13,10 +13,6 @@
 <string name="btn_rechercher">Rechercher</string>
 <string name="hint_recherche">Rechercher par nom</string>
 <string name="admin">Admin</string>
-<string name="admin_pin_title">Accès administrateur</string>
-<string name="admin_pin_hint">PIN</string>
-<string name="pin_incorrect">PIN incorrect</string>
-<string name="admin_active">Mode admin actif</string>
 <string name="ajouter_atelier">Ajouter un atelier</string>
 <string name="nouvel_atelier">Nouvel atelier</string>
 <string name="choisir_club">Choisir un club</string>
@@ -31,8 +27,6 @@
 <string name="atelier_ajoute">Atelier ajouté</string>
 <string name="valider">Valider</string>
 <string name="annuler">Annuler</string>
-<string name="quit_admin">Quitter l’admin</string>
-<string name="admin_banner">MODE ADMIN ACTIVÉ</string>
 <string name="empty_ateliers">Aucun atelier à afficher</string>
 <string name="empty_reservations">Aucune réservation pour le moment</string>
 <string name="empty_filtered_reservations">Aucune réservation dans ce filtre</string>
@@ -97,8 +91,6 @@
 <string name="details_mis_a_jour">Détails mis à jour</string>
 <string name="confirmation_modification">%1$d étudiant(s) inscrit(s) seront concernés</string>
 <string name="fermer">Fermer</string>
-<string name="admin_access">Accès administrateur</string>
-<string name="quit_admin_access">Quitter le mode admin</string>
 <string name="demo_room">I05</string>
 <string name="demo_instructor">Mme Ben Salem</string>
 <string name="demo_waiting">2 personnes devant vous</string>
@@ -111,4 +103,17 @@
 <string name="finished_icon_description">Atelier terminé</string>
 <string name="room_icon_description">Salle</string>
 <string name="instructor_icon_description">Instructeur</string>
+<string name="not_connected">Non connecté</string>
+<string name="connected_as">Connecté : %1$s %2$s</string>
+<string name="btn_logout">Déconnexion</string>
+<string name="cannot_cancel_other">Vous ne pouvez annuler que vos propres réservations</string>
+<string name="empty_my_reservations">Vous n\'avez aucune réservation</string>
+<string name="login_title">Hajz-App — Connexion</string>
+<string name="hint_username">Nom d\'utilisateur</string>
+<string name="hint_password">Mot de passe</string>
+<string name="btn_login">Se connecter</string>
+<string name="login_error">Identifiants incorrects</string>
+<string name="admin_connected">Mode administrateur</string>
+<string name="please_login">Veuillez vous connecter</string>
+<string name="reserve_as">Vous réservez en tant que : %1$s %2$s</string>
 </resources>
