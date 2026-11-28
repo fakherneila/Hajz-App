@@ -115,5 +115,6 @@
 <string name="login_error">Identifiants incorrects</string>
 <string name="admin_connected">Mode administrateur</string>
 <string name="please_login">Veuillez vous connecter</string>
+<string name="demo_users_hint">Démo : etudiant1/etudiant1 · etudiant2/etudiant2 · admin/admin123</string>
 <string name="reserve_as">Vous réservez en tant que : %1$s %2$s</string>
 </resources>
