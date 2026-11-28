@@ -40,9 +40,9 @@ class ReservationAdapter(
         if (position in reservations.indices) notifyItemChanged(position)
     }
 
-    fun replaceItems(items: List<Reservation>) {
+    fun replaceItems(visibleReservations: List<Reservation>) {
         reservations.clear()
-        reservations.addAll(items)
+        reservations.addAll(visibleReservations)
         notifyDataSetChanged()
     }
 
@@ -53,9 +53,9 @@ class ReservationAdapter(
         onCancel(reservation)
     }
 
-    fun restoreItem(item: Reservation, position: Int) {
+    fun restoreItem(reservation: Reservation, position: Int) {
         val restoredPosition = position.coerceIn(0, reservations.size)
-        reservations.add(restoredPosition, item)
+        reservations.add(restoredPosition, reservation)
         notifyItemInserted(restoredPosition)
     }
 }

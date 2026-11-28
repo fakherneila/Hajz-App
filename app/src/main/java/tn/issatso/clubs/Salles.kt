@@ -1,8 +1,5 @@
 package tn.issatso.clubs
 
-/**
- * Official selectable room list for Hajz-App sessions.
- */
 object Salles {
     val salles: List<String> = buildList {
         addAll((1..20).map { "I%02d".format(it) })
@@ -14,8 +11,5 @@ object Salles {
         add("L02")
     }
 
-    /**
-     * Checks an exact, trimmed match. Room codes are case-sensitive.
-     */
-    fun estSalleValide(s: String): Boolean = salles.contains(s.trim())
+    fun estSalleValide(salle: String): Boolean = salles.contains(salle.trim())
 }

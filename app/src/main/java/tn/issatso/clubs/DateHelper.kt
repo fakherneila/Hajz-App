@@ -10,11 +10,8 @@ enum class DateRelation {
 object DateHelper {
     const val DATE_PATTERN = "dd/MM/yyyy"
 
-    /**
-     * Parses a dd/MM/yyyy date without throwing for malformed input.
-     */
-    fun parseDate(value: String): Triple<Int, Int, Int>? {
-        val parts = value.trim().split("/")
+    fun parseDate(date: String): Triple<Int, Int, Int>? {
+        val parts = date.trim().split("/")
         if (parts.size != 3) return null
         val day = parts[0].toIntOrNull() ?: return null
         val month = parts[1].toIntOrNull() ?: return null
@@ -29,24 +26,18 @@ object DateHelper {
         return Triple(day, month, year)
     }
 
-    /**
-     * Compares a workshop date with an explicitly supplied today date.
-     */
     fun compareWithToday(date: String, today: String): DateRelation {
-        val value = parseDate(date) ?: return DateRelation.INVALID
+        val parsedDate = parseDate(date) ?: return DateRelation.INVALID
         val current = parseDate(today) ?: return DateRelation.INVALID
-        val valueKey = value.third * 10000 + value.second * 100 + value.first
+        val dateKey = parsedDate.third * 10000 + parsedDate.second * 100 + parsedDate.first
         val currentKey = current.third * 10000 + current.second * 100 + current.first
         return when {
-            valueKey < currentKey -> DateRelation.PAST
-            valueKey > currentKey -> DateRelation.FUTURE
+            dateKey < currentKey -> DateRelation.PAST
+            dateKey > currentKey -> DateRelation.FUTURE
             else -> DateRelation.TODAY
         }
     }
 
-    /**
-     * Sorts workshops ascending, with invalid dates placed last.
-     */
     fun sortAteliers(ateliers: MutableList<Atelier>) {
         ateliers.sortWith(compareBy<Atelier> {
             val date = parseDate(it.date)

@@ -33,9 +33,6 @@ object BookingManager {
         DateHelper.sortAteliers(ateliers)
     }
 
-    /**
-     * Restores the in-memory demo state and resets waiting-list ticket counters.
-     */
     fun reinitialiserDonnees() {
         ateliers.clear()
         prochainsTickets.clear()
@@ -43,9 +40,6 @@ object BookingManager {
         initialiserDonnees()
     }
 
-    /**
-     * Returns and restores the in-memory state without recreating demo workshops.
-     */
     fun getNextAtelierId(): Int = nextAtelierId
     fun getTicketCounters(): Map<Int, Int> = prochainsTickets.toMap()
 
@@ -61,9 +55,6 @@ object BookingManager {
         nextAtelierId = nextId
     }
 
-    /**
-     * Adds a workshop when all fields are valid and no duplicate exists.
-     */
     fun ajouterAtelier(club: String, nom: String, date: String, capacite: Int): Boolean {
         return ajouterAtelier(
             club,
@@ -75,11 +66,6 @@ object BookingManager {
         ).startsWith("Atelier ajouté")
     }
 
-    /**
-     * Validates and adds a workshop with instructor and room details.
-     *
-     * @return a success message or the specific French validation error.
-     */
     fun ajouterAtelier(
         club: String,
         nom: String,
@@ -126,11 +112,6 @@ object BookingManager {
         return "Atelier ajouté"
     }
 
-    /**
-     * Validates a trimmed and collapsed instructor name.
-     *
-     * @return a French error string, or null when valid.
-     */
     fun validerInstructeur(instructeur: String): String? {
         val normalized = normalizeText(instructeur)
         if (normalized.isEmpty()) return "L’instructeur est obligatoire"
@@ -139,11 +120,6 @@ object BookingManager {
         return null
     }
 
-    /**
-     * Updates editable workshop details without replacing or losing reservations.
-     *
-     * @return "Détails mis à jour" or the first specific validation error.
-     */
     fun modifierDetails(
         atelierId: Int,
         club: String,
@@ -185,11 +161,11 @@ object BookingManager {
         return "Détails mis à jour"
     }
 
-    private fun normalizeText(value: String): String =
-        value.trim().replace(Regex("\\s+"), " ")
+    private fun normalizeText(text: String): String =
+        text.trim().replace(Regex("\\s+"), " ")
 
-    private fun normalizeDate(value: String): String {
-        val trimmed = value.trim()
+    private fun normalizeDate(date: String): String {
+        val trimmed = date.trim()
         val slashParts = trimmed.split("/")
         if (slashParts.size == 3 &&
             slashParts.all { it.isNotBlank() } &&
@@ -224,16 +200,10 @@ object BookingManager {
         return trimmed.lowercase()
     }
 
-    /**
-     * Returns the number of confirmed places still available for a workshop.
-     */
     fun placesLibres(atelier: Atelier): Int {
         return (atelier.capacite - reservationsConfirmees(atelier)).coerceAtLeast(0)
     }
 
-    /**
-     * Counts waiting reservations with a smaller ticket number in the same workshop.
-     */
     fun personnesDevant(reservation: Reservation): Int {
         val ticket = reservation.ticketAttente ?: return 0
         return reservation.atelier.reservations.count {
@@ -242,9 +212,6 @@ object BookingManager {
         }
     }
 
-    /**
-     * Registers a student or appends them to the workshop FIFO waiting list.
-     */
     fun reserver(nom: String, prenom: String, atelier: Atelier): String {
         val nomNettoye = nom.trim()
         val prenomNettoye = prenom.trim()
@@ -273,9 +240,6 @@ object BookingManager {
         return "Succès : Inscription enregistrée (${nouvelleReservation.getStatut()})"
     }
 
-    /**
-     * Cancels a reservation and promotes the oldest waiting reservation if needed.
-     */
     fun annuler(reservation: Reservation): CancellationUndo? {
         val atelier = reservation.atelier
         val etaitConfirme = reservation.ticketAttente == null
@@ -295,9 +259,6 @@ object BookingManager {
         )
     }
 
-    /**
-     * Restores a cancellation snapshot, including the previous promotion state.
-     */
     fun restaurerAnnulation(undo: CancellationUndo) {
         undo.promotedReservation?.ticketAttente = undo.promotedTicket
         if (!undo.atelier.reservations.contains(undo.reservation)) {
@@ -306,11 +267,6 @@ object BookingManager {
         }
     }
 
-    /**
-     * Changes capacity and promotes waiting students in ticket order when possible.
-     *
-     * @return the number of reservations promoted, or -1 when the capacity is invalid.
-     */
     fun changerCapacite(atelier: Atelier, nouvelleCapacite: Int): Int {
          if (nouvelleCapacite !in 1..50 || nouvelleCapacite < reservationsConfirmees(atelier)) return -1
         atelier.capacite = nouvelleCapacite
@@ -323,11 +279,6 @@ object BookingManager {
         return promus
     }
 
-    /**
-     * Removes a workshop and every reservation attached to it.
-     *
-     * @return true when the workshop existed and was removed.
-     */
     fun supprimerAtelier(atelier: Atelier): Boolean {
         val removed = ateliers.remove(atelier)
         if (removed) {

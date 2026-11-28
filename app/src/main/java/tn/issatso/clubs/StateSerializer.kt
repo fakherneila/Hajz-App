@@ -1,8 +1,5 @@
 package tn.issatso.clubs
 
-/**
- * Delimiter-safe pure-Kotlin serialization for the complete in-memory application state.
- */
 object StateSerializer {
     private const val DELIMITER = '|'
 
@@ -42,9 +39,9 @@ object StateSerializer {
         return lines.joinToString("\n")
     }
 
-    fun deserialize(value: String): Snapshot? {
-        if (value.isBlank()) return null
-        val lines = value.split('\n')
+    fun deserialize(serializedState: String): Snapshot? {
+        if (serializedState.isBlank()) return null
+        val lines = serializedState.split('\n')
         if (lines.firstOrNull() != "STATE|1") return null
 
         val workshops = mutableMapOf<Int, Atelier>()
@@ -108,30 +105,30 @@ object StateSerializer {
 
     private data class ReservationDraft(val nom: String, val prenom: String)
 
-    private fun escape(value: String): String =
-        value.replace("\\", "\\\\")
+    private fun escape(text: String): String =
+        text.replace("\\", "\\\\")
             .replace("|", "\\p")
             .replace("\n", "\\n")
             .replace("\r", "\\r")
 
-    private fun unescape(value: String): String {
-        val output = StringBuilder()
+    private fun unescape(encodedText: String): String {
+        val decodedText = StringBuilder()
         var index = 0
-        while (index < value.length) {
-            if (value[index] == '\\' && index + 1 < value.length) {
-                when (value[index + 1]) {
-                    '\\' -> output.append('\\')
-                    'p' -> output.append('|')
-                    'n' -> output.append('\n')
-                    'r' -> output.append('\r')
-                    else -> output.append(value[index])
+        while (index < encodedText.length) {
+            if (encodedText[index] == '\\' && index + 1 < encodedText.length) {
+                when (encodedText[index + 1]) {
+                    '\\' -> decodedText.append('\\')
+                    'p' -> decodedText.append('|')
+                    'n' -> decodedText.append('\n')
+                    'r' -> decodedText.append('\r')
+                    else -> decodedText.append(encodedText[index])
                 }
                 index += 2
             } else {
-                output.append(value[index])
+                decodedText.append(encodedText[index])
                 index++
             }
         }
-        return output.toString()
+        return decodedText.toString()
     }
 }

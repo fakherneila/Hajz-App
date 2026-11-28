@@ -2,14 +2,7 @@ package tn.issatso.clubs
 
 import java.text.Normalizer
 
-/**
- * Pure filtering helpers for the workshop list.
- */
 object FiltreAteliers {
-    /**
-     * Filters workshops by a case-insensitive and accent-insensitive search
-     * and an exact club selection.
-     */
     fun filtrer(
         ateliers: List<Atelier>,
         searchText: String,
@@ -28,9 +21,6 @@ object FiltreAteliers {
         }
     }
 
-    /**
-     * Returns one normalized club label per distinct club.
-     */
     fun clubsDistincts(ateliers: List<Atelier>): List<String> =
         ateliers
             .map { it.club.trim().replace(Regex("\\s+"), " ") }
@@ -38,8 +28,8 @@ object FiltreAteliers {
             .distinctBy { normalize(it) }
             .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it })
 
-    fun normalize(value: String): String =
-        Normalizer.normalize(value.trim(), Normalizer.Form.NFD)
+    fun normalize(text: String): String =
+        Normalizer.normalize(text.trim(), Normalizer.Form.NFD)
             .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
             .lowercase()
             .trim()

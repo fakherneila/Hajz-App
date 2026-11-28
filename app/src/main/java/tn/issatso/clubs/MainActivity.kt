@@ -69,55 +69,55 @@ class MainActivity : AppCompatActivity() {
     private var activeView = "A"
     private var selectedWorkshopId: Int? = null
 
-    // --- ADAPTATEUR RECYCLERVIEW POUR LES ATELIERS (VUE A) ---
     inner class AtelierAdapter(private val ateliers: List<Atelier>) :
         RecyclerView.Adapter<AtelierAdapter.ViewHolder>() {
 
-        inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-            val tvClub: TextView = v.findViewById(R.id.tvClub)
-            val tvTitre: TextView = v.findViewById(R.id.tvTitre)
-            val tvDate: TextView = v.findViewById(R.id.tvDate)
-            val tvStatus: TextView = v.findViewById(R.id.tvStatus)
-            val tvSalle: TextView = v.findViewById(R.id.tvSalle)
-            val tvInstructeur: TextView = v.findViewById(R.id.tvInstructeur)
-            val pbPlaces: ProgressBar = v.findViewById(R.id.pbPlaces)
+        inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val tvClub: TextView = view.findViewById(R.id.tvClub)
+            val tvTitre: TextView = view.findViewById(R.id.tvTitre)
+            val tvDate: TextView = view.findViewById(R.id.tvDate)
+            val tvStatus: TextView = view.findViewById(R.id.tvStatus)
+            val tvSalle: TextView = view.findViewById(R.id.tvSalle)
+            val tvInstructeur: TextView = view.findViewById(R.id.tvInstructeur)
+            val pbPlaces: ProgressBar = view.findViewById(R.id.pbPlaces)
             val btnReserver: com.google.android.material.button.MaterialButton =
-                v.findViewById(R.id.btnReserver)
+                view.findViewById(R.id.btnReserver)
             val btnDetails: com.google.android.material.button.MaterialButton =
-                v.findViewById(R.id.btnDetails)
+                view.findViewById(R.id.btnDetails)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val v = LayoutInflater.from(parent.context).inflate(R.layout.item_atelier, parent, false)
-            return ViewHolder(v)
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_atelier, parent, false)
+            return ViewHolder(view)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val a = ateliers[position]
-            holder.tvClub.text = a.club
-            holder.tvTitre.text = a.nom
-            holder.tvSalle.text = a.salle
-            holder.tvInstructeur.text = a.instructeur
+            val atelier = ateliers[position]
+            holder.tvClub.text = atelier.club
+            holder.tvTitre.text = atelier.nom
+            holder.tvSalle.text = atelier.salle
+            holder.tvInstructeur.text = atelier.instructeur
             val today = SimpleDateFormat(DateHelper.DATE_PATTERN, Locale.getDefault())
                 .format(Calendar.getInstance().time)
-            val relation = DateHelper.compareWithToday(a.date, today)
+            val relation = DateHelper.compareWithToday(atelier.date, today)
             val isPast = relation == DateRelation.PAST
-            holder.tvDate.text = if (isPast) "${a.date} · Terminé" else a.date
+            holder.tvDate.text = if (isPast) "${atelier.date} · Terminé" else atelier.date
 
-            val places = BookingManager.placesLibres(a)
-            val occupied = (a.capacite - places).coerceIn(0, a.capacite)
-            val statusText = if (places > 0) "$occupied/${a.capacite}" else "Complet"
+            val places = BookingManager.placesLibres(atelier)
+            val occupied = (atelier.capacite - places).coerceIn(0, atelier.capacite)
+            val statusText = if (places > 0) "$occupied/${atelier.capacite}" else "Complet"
             holder.tvStatus.text = if (isPast) "Terminé · $statusText" else statusText
             if (places > 0) {
                 holder.tvStatus.setTextColor(applicationContext.getColor(R.color.secondary))
             } else {
                 holder.tvStatus.setTextColor(applicationContext.getColor(R.color.danger))
             }
-            holder.pbPlaces.max = a.capacite
+            holder.pbPlaces.max = atelier.capacite
             holder.pbPlaces.progress = occupied
             val capacityColor = when {
                 places == 0 -> R.color.capacity_red
-                places.toDouble() / a.capacite.toDouble() > 0.5 -> R.color.capacity_green
+                places.toDouble() / atelier.capacite.toDouble() > 0.5 -> R.color.capacity_green
                 else -> R.color.capacity_orange
             }
             holder.pbPlaces.progressTintList =
@@ -142,21 +142,20 @@ class MainActivity : AppCompatActivity() {
                 }
             )
 
-            // Click to reserve
             holder.itemView.setOnClickListener {
                 if (isPast) {
                     Toast.makeText(this@MainActivity, "Atelier terminé", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
-                selectedWorkshopId = a.id
+                selectedWorkshopId = atelier.id
                 val spinner = findViewById<Spinner>(R.id.spAteliers)
-                val reservableIndex = reservableAteliers().indexOf(a)
+                val reservableIndex = reservableAteliers().indexOf(atelier)
                 if (reservableIndex >= 0) spinner.setSelection(reservableIndex)
                 afficherVueB()
             }
             holder.itemView.setOnLongClickListener {
                 if (isAdmin()) {
-                    showAdminWorkshopDialog(a)
+                    showAdminWorkshopDialog(atelier)
                     true
                 } else {
                     false
@@ -167,8 +166,7 @@ class MainActivity : AppCompatActivity() {
             }
             holder.btnReserver.isEnabled = !isPast
             holder.btnReserver.text = ""
-            holder.btnDetails.setOnClickListener { showDetailsDialog(a) }
-                        // Staggered fade-in animation for cards
+            holder.btnDetails.setOnClickListener { showDetailsDialog(atelier) }
             if (animationsEnabled() && position < 6) {
                 holder.itemView.alpha = 0f
                 holder.itemView.animate().alpha(1f).setDuration(250)
@@ -218,7 +216,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        // Setup RecyclerView
         val rvAteliers = findViewById<RecyclerView>(R.id.rvAteliers)
         rvAteliers.layoutManager = LinearLayoutManager(this)
 
@@ -273,12 +270,10 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.btnExporter).setOnClickListener { exportAteliers() }
         updateAdminUi()
 
-        // Setup Spinner
         refreshAtelierSpinner()
         
         btnConfirmerReservation.setOnClickListener { gererReservation() }
 
-        // Setup Vue C
         val rvReservations = findViewById<RecyclerView>(R.id.rvReservations)
         rvReservations.layoutManager = LinearLayoutManager(this)
         adapterReservations = ReservationAdapter(
@@ -461,7 +456,6 @@ class MainActivity : AppCompatActivity() {
         actualiserVueC()
     }
 
-    // The Animation Magic
     private fun animateTransition(fromView: View, toView: View) {
         if (!animationsEnabled()) {
             fromView.animate().cancel()
@@ -483,7 +477,6 @@ class MainActivity : AppCompatActivity() {
         toView.visibility = View.VISIBLE
         toView.animate().alpha(1f).translationY(0f).setDuration(300).start()
         
-        // Start slightly lower for a slide-up effect
         toView.translationY = 50f
     }
 
@@ -834,7 +827,7 @@ class MainActivity : AppCompatActivity() {
                 val salle = if (roomSpinner.selectedItemPosition > 0) {
                     roomSpinner.selectedItem.toString()
                 } else ""
-                val result = BookingManager.ajouterAtelier(
+                val message = BookingManager.ajouterAtelier(
                     club,
                     nom,
                     date,
@@ -842,7 +835,7 @@ class MainActivity : AppCompatActivity() {
                     instructorInput.text.toString(),
                     salle
                 )
-                if (result == "Atelier ajouté") {
+                if (message == "Atelier ajouté") {
                     refreshAtelierSpinner()
                     rebuildClubChips()
                     actualiserVueA()
@@ -850,7 +843,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, R.string.atelier_ajoute, Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
                 } else {
-                    Toast.makeText(this, result, Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, message, Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -940,9 +933,9 @@ class MainActivity : AppCompatActivity() {
                 0
             )
         }
-        fun fieldInput(hint: String, value: String = "") = EditText(this).apply {
+        fun fieldInput(hint: String, initialValue: String = "") = EditText(this).apply {
             this.hint = hint
-            setText(value)
+            setText(initialValue)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -991,7 +984,7 @@ class MainActivity : AppCompatActivity() {
             val salle = if (roomSpinner.selectedItemPosition > 0) {
                 roomSpinner.selectedItem.toString()
             } else ""
-            val result = BookingManager.modifierDetails(
+            val message = BookingManager.modifierDetails(
                 atelier.id,
                 clubInput.text.toString(),
                 nameInput.text.toString(),
@@ -999,7 +992,7 @@ class MainActivity : AppCompatActivity() {
                 salle,
                 instructorInput.text.toString()
             )
-            if (result == "Détails mis à jour") {
+            if (message == "Détails mis à jour") {
                 refreshAtelierSpinner()
                 rebuildClubChips()
                 actualiserVueA()
@@ -1007,7 +1000,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, R.string.details_mis_a_jour, Toast.LENGTH_SHORT).show()
                 dialog.dismiss()
             } else {
-                Toast.makeText(this, result, Toast.LENGTH_LONG).show()
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show()
             }
         }
 

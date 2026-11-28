@@ -1,12 +1,6 @@
 package tn.issatso.clubs
 
-/**
- * Builds a plain-text export without Android dependencies.
- */
 object ExportAteliers {
-    /**
-     * Generates the ordered plain-text workshop summary for Hajz-App sharing.
-     */
     fun generer(ateliers: List<Atelier>): String = buildString {
         appendLine("Hajz-App")
         appendLine("Liste des ateliers")
